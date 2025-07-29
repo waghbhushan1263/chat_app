@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Public Chat Room</title>
+  <style>
+    body {
+      background: #0f0f0f;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
+      margin: 0;
+    }
+
+    #room-container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #1e1e1e;
+      border-radius: 10px;
+      box-shadow: 0 0 20px cyan;
+    }
+
+    #home-header {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: #0ff;
+      text-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+    }
+
+    #room-subsection {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    #room-subsection h2 span {
+      color: #0ff;
+    }
+
+    #leave-chat-btn {
+      display: inline-block;
+      margin-top: 10px;
+      background: red;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 5px;
+      text-decoration: none;
+    }
+
+    #chat-room-widget {
+      background: #121212;
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    #msgs-container {
+      background: #222;
+      height: 400px;
+      overflow-y: auto;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    #messages {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .message-item {
+      margin-bottom: 10px;
+    }
+
+    .message-bubble {
+      background: #333;
+      padding: 10px;
+      border-radius: 5px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .message-bubble:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 10px #0ff;
+    }
+
+    .self-message .message-bubble {
+      background: #0044ff;
+      text-align: right;
+      color: white;
+    }
+
+    .peer-message .message-bubble {
+      background: #444;
+      text-align: left;
+      color: white;
+    }
+
+    .ai-message {
+      background: #5500ff;
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      margin: 5px 0;
+      box-shadow: 0 0 10px #5500ff;
+    }
+
+    .system-message {
+      text-align: center;
+      color: #aaa;
+    }
+
+    #message-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    #message-input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+    }
+
+    .btn-neon {
+      color: #fff;
+      border: 2px solid #0ff;
+      background: transparent;
+      position: relative;
+      transition: all 0.3s ease;
+      overflow: hidden;
+      z-index: 1;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .btn-neon:hover {
+      color: #000;
+      background: #0ff;
+      box-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 40px #0ff;
+    }
+
+    .btn-neon::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: rgba(0, 255, 255, 0.1);
+      transform: rotate(45deg);
+      transition: all 0.5s ease;
+      z-index: -1;
+    }
+    @media (max-width: 768px) {
+  #room-container {
+    margin: 10px;
+    padding: 15px;
+  }
+
+  #home-header {
+    font-size: 1.5rem;
+  }
+
+  #msgs-container {
+    height: 300px;
+  }
+
+  #message-box {
+    flex-direction: column;
+  }
+
+  #message-box form {
+    flex-direction: column;
+  }
+
+  #message-input {
+    width: 100%;
+  }
+
+  .btn-neon {
+    width: 100%;
+    text-align: center;
+  }
+
+  input[type="file"] {
+    width: 100%;
+  }
+}
+
+
+    .btn-neon:hover::before {
+      top: -60%;
+      left: -60%;
+      background: rgba(0, 255, 255, 0.3);
+    }
+  </style>
+</head>
+
+<body>
+  <div id="room-container">
+    <h1 id="home-header">🌐 Public Chat Room</h1>
+    <div id="room-subsection">
+      <h2>Room ID: <span>{{ room }}</span></h2>
+      <h2>User: <span>{{ user }}</span></h2>
+      <a href="/" id="leave-chat-btn">Leave</a>
+    </div>
+
+    <div id="chat-room-widget">
+      <div id="msgs-container">
+        <ul id="messages"></ul>
+      </div>
+
+      <div id="message-box">
+        <form onsubmit="sendMessage(event)" style="flex: 1; display: flex; gap: 10px;">
+          
+          <input type="text" id="message-input" placeholder="Type your message..." />
+          <button type="submit" class="btn-neon">Send</button>
+        </form>
+        <input type="file" id="fileInput" class="btn-neon"/>
+        <button onclick="sendFile()" class="btn-neon">Send File</button>
+        <button onclick="askAI()" class="btn-neon">Ask AI</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+  <script>
+    const socketio = io();
+    const currentUser = "{{ user }}";
+    const room = "{{ room }}";
+
+    socketio.emit("join", { room: room, username: currentUser });
+
+    const messages = document.getElementById("messages");
+    const pastMessages = {{ messages | tojson }};
+    pastMessages.forEach(msg => {
+      createChatItem(msg.content, msg.sender);
+    });
+
+    socketio.on("message", function (message) {
+      createChatItem(message.message, message.sender);
+    });
+
+    socketio.on("receive_file", function (data) {
+      const li = document.createElement("li");
+      li.innerHTML = `<b>${escapeHtml(data.username)}:</b> <a href="${data.file_url}" target="_blank">Download File</a>`;
+      messages.appendChild(li);
+      scrollToBottom();
+    });
+
+    function sendMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById("message-input");
+      const msg = input.value.trim();
+      if (!msg) return;
+
+      socketio.emit("message", { message: msg, sender: currentUser, room: room });
+      input.value = "";
+    }
+
+    function createChatItem(message, sender) {
+      const isSelf = currentUser === sender;
+      const li = document.createElement("li");
+
+      if (!sender) {
+        li.className = "system-message";
+        li.innerHTML = `<p class="member-activity">${escapeHtml(message)}</p>`;
+      } else if (sender === "AI") {
+        li.className = "ai-message";
+        li.innerHTML = `<p><strong>AI:</strong> ${escapeHtml(message)}</p>`;
+      } else {
+        li.className = `message-item ${isSelf ? "self-message" : "peer-message"}`;
+        li.innerHTML = `
+          <div class="message-bubble">
+            <strong>${escapeHtml(sender)}:</strong>
+            <p>${escapeHtml(message)}</p>
+            <small>${new Date().toLocaleTimeString()}</small>
+          </div>
+        `;
+      }
+
+      messages.appendChild(li);
+      scrollToBottom();
+    }
+
+    function sendFile() {
+      const file = document.getElementById("fileInput").files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      fetch("/upload", { method: "POST", body: formData })
+        .then(res => res.json())
+        .then(data => {
+          if (data.file_url) {
+            socketio.emit("send_file", {
+              username: currentUser,
+              file_url: data.file_url,
+              room: room
+            });
+          }
+        })
+        .catch(err => console.error("File Upload Error:", err));
+    }
+
+    // function askAI() {
+    //   const msg = document.getElementById("message-input").value.trim();
+    //   if (!msg) return;
+
+    //   fetch("/ai_chat", {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify({ message: msg })
+    //   })
+    //   .then(res => res.json())
+    //   .then(data => {
+    //     createChatItem(data.reply, "AI");
+    //   })
+    //   .catch(err => console.error("AI Error:", err));
+    // }
+
+    // function scrollToBottom() {
+    //   messages.scrollTop = messages.scrollHeight;
+    // }
+
+    // function escapeHtml(text) {
+    //   return text.replace(/[&<>"']/g, m => ({
+    //     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+    //   }[m]));
+    // }
+
+     function askAI() {
+    const userMessage = document.getElementById("message-input").value.trim();
+    if (!userMessage) return;
+     console.log(userMessage);
+
+    fetch("/ai_chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: userMessage })
+      
+    })
+    
+    .then(res => {
+    if (!res.ok) {
+      if (res.status === 429) {
+        // If rate limited, show user message
+        createChatItem("You are sending too fast. Please wait 1 minute before next AI request.", "System");
+      }
+      // If response not ok (400, 500 etc), throw error with status text
+      return res.text().then(text => { throw new Error(text); });
+    }
+    return res.json();
+  })
+    .then(data => {
+      createChatItem(data.reply, "AI");
+    })
+    .catch(err => console.error("AI Error:", err));
+  }
+
+  function scrollToBottom() {
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function escapeHtml(text) {
+    return text.replace(/[&<>"']/g, m => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
+    }[m]));
+  }
+  </script>
+</body>
+</html>

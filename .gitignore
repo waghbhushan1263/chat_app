@@ -1,0 +1,10 @@
+bugs.txt
+features.txt
+frontend.txt
+theory.txt
+topics.txt
+why.txt
+main/uploads/*
+!main/uploads/.keep
+main/__pycache__/
+.env

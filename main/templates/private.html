@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flask Chat 💬</title>
+  <style>
+    @media (max-width: 600px) {
+  #home-container {
+    margin: 20px;
+    padding: 20px;
+  }
+
+  #home-header {
+    font-size: 1.5rem;
+  }
+
+  form {
+    gap: 15px;
+  }
+
+  input[type="text"], button {
+    font-size: 1rem;
+  }
+
+  button {
+    padding: 8px;
+  }
+}
+
+    body {
+      background: #0f0f0f;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
+      margin: 0;
+    }
+
+    #home-container {
+      max-width: 500px;
+      margin: 50px auto;
+      background: #1e1e1e;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px cyan;
+      text-align: center;
+    }
+
+    #home-header {
+      font-size: 2rem;
+      color: #0ff;
+      text-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+      margin-bottom: 20px;
+    }
+
+    #error {
+      background: #ff4d4d;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      text-align: left;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background: cyan;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #00b3b3;
+    }
+
+    hr {
+      border: none;
+      height: 1px;
+      background: #444;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="home-container">
+    <h1 id="home-header">Flask Chat 💬</h1>
+
+    <!-- Error message placeholder -->
+    <p id="error" style="display: none;"></p>
+
+    <form method="post" id="chat-widget-home">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div id="name-input">
+        <label for="name">Enter your name</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          placeholder="Enter name"
+        />
+      </div>
+
+      <div>
+        <label for="code" id="code-label">Enter chat room code</label>
+        <input
+          type="text"
+          id="code"
+          name="code"
+          placeholder="Enter code"
+        />
+        <button type="submit" id="join" name="join">Join</button>
+      </div>
+
+      <hr />
+
+      <button type="submit" id="create" name="create">Create Room</button>
+    </form>
+  </div>
+
+  <script>
+    // Example to show error dynamically if needed
+    const errorEl = document.getElementById('error');
+    const urlParams = new URLSearchParams(window.location.search);
+    const errorMsg = urlParams.get('error');
+    if (errorMsg) {
+      errorEl.textContent = errorMsg;
+      errorEl.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
