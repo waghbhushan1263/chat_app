@@ -31,7 +31,7 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 app = Flask(__name__)
 csrf = CSRFProtect(app)
-socketio = SocketIO(app)
+socketio = SocketIO(app, async_mode='gevent')
 
 # For local (no Docker)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:123456@localhost:5432/chatapp'
@@ -131,6 +131,7 @@ def load_user(user_id):
 
 
 ############################################# uploads 
+@csrf.exempt
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
@@ -145,7 +146,7 @@ def upload_file():
         return {"message": "File uploaded", "file_url": f"/uploads/{filename}"}, 200
     return {"error": "File type not allowed"}, 400
 
-
+@csrf.exempt
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
@@ -315,6 +316,15 @@ def test_postgres():
         return "PostgreSQL Connected 🟢"
     except Exception as e:
         return f"PostgreSQL Connection Error 🔴: {e}"
+
+
+@app.route("/test_block")
+def test_block_route():
+    import time
+    print("STARTED blocking route")
+    time.sleep(10)
+    print("ENDED blocking route")
+    return "Finished after 10s"
 
 
 

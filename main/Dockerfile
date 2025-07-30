@@ -16,3 +16,4 @@ EXPOSE 8150
 
 # Command to run your app
 CMD ["python", "main.py"]
+

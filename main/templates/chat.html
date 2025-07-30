@@ -4,8 +4,13 @@
   
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Flask Chat Room 💬</title>
+  <title>chatapp</title>
   <style>
+    @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.4; }
+    100% { opacity: 1; }
+  }
     body {
       background: #0f0f0f;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -168,8 +173,21 @@
   </div>
 </div>
 
+<div id="loader" style="display:none; text-align:center; margin-top: 10px;">
+  <span style="color:cyan; font-style: italic; animation: pulse 1s infinite;">⏳ Processing...</span>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 <script>
+
+  function showLoader() {
+  document.getElementById("loader").style.display = "block";
+}
+
+function hideLoader() {
+  document.getElementById("loader").style.display = "none";
+}
+
   const socketio = io();
   const currentUser = "{{ user }}";
   const room = "{{ room }}";
@@ -236,53 +254,60 @@
   }
 
   function sendFile() {
-    const file = document.getElementById("fileInput").files[0];
-    if (!file) return;
+  const file = document.getElementById("fileInput").files[0];
+  if (!file) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
+  const formData = new FormData();
+  formData.append("file", file);
 
-    fetch("/upload", { method: "POST", body: formData })
-      .then(res => res.json())
-      .then(data => {
-        if (data.file_url) {
-          socketio.emit("send_file", {
-            username: currentUser,
-            file_url: data.file_url
-          });
-        }
-      })
-      .catch(err => console.error("File Upload Error:", err));
-  }
+  showLoader();
+  fetch("/upload", { method: "POST", body: formData })
+    .then(res => res.json())
+    .then(data => {
+      hideLoader();
+      if (data.file_url) {
+        socketio.emit("send_file", {
+          username: currentUser,
+          file_url: data.file_url
+        });
+      }
+    })
+    .catch(err => {
+      hideLoader();
+      console.error("File Upload Error:", err);
+    });
+}
 
   function askAI() {
-    const userMessage = document.getElementById("message-input").value.trim();
-    if (!userMessage) return;
-     console.log(userMessage);
+  const userMessage = document.getElementById("message-input").value.trim();
+  if (!userMessage) return;
 
-    fetch("/ai_chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: userMessage })
-      
-    })
-    
-    .then(res => {
+  showLoader();
+
+  fetch("/ai_chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: userMessage })
+  })
+  .then(res => {
+    hideLoader();
     if (!res.ok) {
       if (res.status === 429) {
-        // If rate limited, show user message
         createChatItem("You are sending too fast. Please wait 1 minute before next AI request.", "System");
       }
-      // If response not ok (400, 500 etc), throw error with status text
       return res.text().then(text => { throw new Error(text); });
     }
     return res.json();
   })
-    .then(data => {
-      createChatItem(data.reply, "AI");
-    })
-    .catch(err => console.error("AI Error:", err));
-  }
+  .then(data => {
+    createChatItem(data.reply, "AI");
+  })
+  .catch(err => {
+    hideLoader();
+    console.error("AI Error:", err);
+  });
+}
+
 
   function scrollToBottom() {
     messages.scrollTop = messages.scrollHeight;

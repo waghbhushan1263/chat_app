@@ -16,5 +16,7 @@ redis
 flask_wtf
 Flask-Limiter
 python-dotenv
+gevent
+gevent-websocket
 
 
