@@ -249,7 +249,7 @@ App will be live at:
 ![App Screenshot](screenshots/Screenshot 2025-07-30 175800.png)
 
 - Rate Limiting
-![App Screenshot](screenshots/Screenshot 2025-07-30 175811.png)
+![App Screenshot]([screenshots/Screenshot 2025-07-30 175811.png](https://github.com/waghbhushan1263/chat_app/blob/main/screenshots/Screenshot%202025-07-30%20175744.png))
 
 - File upload
 ![App Screenshot](screenshots/Screenshot 2025-07-30 175829.png)
