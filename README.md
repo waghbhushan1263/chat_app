@@ -276,7 +276,7 @@ App will be live at:
 
 
 - Postgre Instance
-![App Screenshot](screenshots/Screenshot 2025-07-30 180743.png)
+![App Screenshot](screenshots/postgres.png)
 
 
 
