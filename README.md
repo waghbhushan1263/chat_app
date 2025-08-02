@@ -258,7 +258,7 @@ App will be live at:
 ![App Screenshot](screenshots/Screenshot 2025-07-30 180002.png)
 
 - Logged in Home Page
-![App Screenshot](screenshots/Screenshot 2025-07-30 180023.png)
+![App Screenshot](screenshots/home_w_log.png)
 
 - Logged off Home Page
 ![App Screenshot](screenshots/Screenshot 2025-07-30 180031.png)
