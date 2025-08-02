@@ -244,30 +244,36 @@ App will be live at:
 
 ## Screenshots
 - sample chatting
+![App Screenshot](screenshots/conversation.png)
 
-![App Screenshot](screenshots/Screenshot 2025-07-30 175744.png)
-![App Screenshot](screenshots/Screenshot 2025-07-30 175800.png)
+- Signup Page
+![App Screenshot](screenshots/sign.png)
 
-- Rate Limiting
-![App Screenshot]([screenshots/Screenshot 2025-07-30 175811.png](https://github.com/waghbhushan1263/chat_app/blob/main/screenshots/Screenshot%202025-07-30%20175744.png))
-
-- File upload
-![App Screenshot](screenshots/Screenshot 2025-07-30 175829.png)
-
-- Ai Reply
-![App Screenshot](screenshots/Screenshot 2025-07-30 180002.png)
+- Login page
+![App Screenshot](screenshots/log.png)
 
 - Logged in Home Page
 ![App Screenshot](screenshots/home_w_log.png)
 
 - Logged off Home Page
-![App Screenshot](screenshots/Screenshot 2025-07-30 180031.png)
+![App Screenshot](screenshots/home_wo_log.png)
 
-- Login page
-![App Screenshot](screenshots/Screenshot 2025-07-30 180035.png)
+- Rate Limiting
+![App Screenshot](screenshots/rate_limit.png)
 
-- Signup Page
-![App Screenshot](screenshots/Screenshot 2025-07-30 180043.png)
+- File upload
+![App Screenshot](screenshots/file.png)
+
+- Ai Reply
+![App Screenshot](screenshots/ai.png)
+
+
+
+
+
+
+
+
 
 - Postgre Instance
 ![App Screenshot](screenshots/Screenshot 2025-07-30 180743.png)
